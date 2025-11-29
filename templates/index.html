@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yatırım Takip</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Yatırım Takip</h1>
+            <div id="last-updated" style="color: var(--text-secondary); font-size: 0.875rem;"></div>
+        </header>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-title">Güncel Kurlar</div>
+            <div id="live-rates" class="rates-strip" style="margin-top: 1rem;">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Ticker Tape -->
+        <div class="ticker-wrap">
+            <div class="ticker" id="rates-ticker">
+                <!-- Ticker items will be injected here -->
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">Finansal Özet</div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.2rem;">Toplam
+                            Varlık</div>
+                        <div class="card-value" id="total-value" style="font-size: 3rem;">₺0.00</div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.2rem;">Toplam
+                                Maliyet</div>
+                            <div id="total-cost" style="font-size: 1.5rem; font-weight: 600;">₺0.00</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 0.2rem;">Kar /
+                                Zarar</div>
+                            <div id="total-profit-loss" style="font-size: 1.5rem; font-weight: 600;">
+                                <span id="profit-loss-amount">₺0.00</span>
+                                <span id="profit-loss-percent"
+                                    style="font-size: 0.8rem; margin-left: 0.25rem;">(%0.00)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Varlık Dağılımı</div>
+                <div id="portfolio-summary"
+                    style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <!-- Summary injected here -->
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem; margin-bottom: 2rem;">
+            <div class="card-title">Alternatif Senaryo</div>
+            <div id="alternative-scenario"
+                style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                    Yatırım yaptığınız tarihlerde aynı tutarla Bitcoin (BTC) veya Ethereum (ETH) alsaydınız:
+                </div>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <div class="investments-list">
+            <div class="card-title" style="margin-bottom: 1rem;">Yatırımlarım</div>
+            <div style="overflow-x: auto;">
+                <table class="investments-table">
+                    <thead>
+                        <tr>
+                            <th>Döviz Cinsi</th>
+                            <th>Miktar</th>
+                            <th>Alış Fiyatı</th>
+                            <th>Komisyon</th>
+                            <th>Tarih</th>
+                            <th>Toplam Maliyet</th>
+                            <th>Güncel Değer</th>
+                            <th>Kar / Zarar</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="investment-tbody">
+                        <!-- Investments will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab-btn" onclick="openModal()" title="Yeni Yatırım Ekle">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <!-- Add Investment Modal -->
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 style="margin-bottom: 1.5rem;">Yeni Yatırım Ekle</h2>
+            <form onsubmit="addInvestment(event)">
+                <div class="form-group">
+                    <label>Döviz Cinsi</label>
+                    <select id="currency" required>
+                        <option value="USD">Dolar (USD)</option>
+                        <option value="EUR">Euro (EUR)</option>
+                        <option value="GOLD">Altın (Gr)</option>
+                        <option value="SILVER">Gümüş (Gr)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Miktar</label>
+                    <input type="number" id="amount" step="any" required placeholder="Örn: 100">
+                </div>
+                <div class="form-group">
+                    <label>Alış Fiyatı (Birim)</label>
+                    <input type="number" id="buy-price" step="any" required placeholder="Örn: 32.50">
+                </div>
+                <div class="form-group">
+                    <label>Komisyon / Masraf (Opsiyonel)</label>
+                    <input type="number" id="fee" step="any" placeholder="Örn: 10">
+                </div>
+                <div class="form-group">
+                    <label>İşlem Tarihi</label>
+                    <input type="date" id="date" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 style="margin-bottom: 1rem;">Yatırımı Sil</h3>
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Bu işlemi geri alamazsınız. Devam etmek
+                istiyor musunuz?</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn" onclick="closeDeleteModal()"
+                    style="background: transparent; border: 1px solid var(--card-border);">İptal</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
