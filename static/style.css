@@ -15,6 +15,44 @@
     --glass-blur: 12px;
 }
 
+:root[data-theme="light"] {
+    --bg-color: #f1f5f9;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --accent-silver: #94a3b8;
+
+    /* Ensure shadows are visible in light mode */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Privacy Mode */
+body.privacy-active .card-value,
+body.privacy-active #total-profit-loss span,
+body.privacy-active #portfolio-summary div:nth-child(2) div:first-child,
+body.privacy-active #portfolio-summary div:nth-child(2) div:last-child {
+    filter: blur(5px);
+    transition: filter 0.3s;
+}
+
+body.privacy-active .investments-table td:nth-child(2),
+/* Miktar */
+body.privacy-active .investments-table td:nth-child(3),
+/* Alış */
+body.privacy-active .investments-table td:nth-child(4),
+/* Komisyon */
+body.privacy-active .investments-table td:nth-child(6),
+/* Toplam */
+body.privacy-active .investments-table td:nth-child(7),
+/* Güncel */
+body.privacy-active .investments-table td:nth-child(8)
+
+/* Kar/Zarar */
+    {
+    filter: blur(4px);
+}
+
 * {
     box-sizing: border_box;
     margin: 0;
@@ -526,4 +564,88 @@ select:focus {
     color: var(--danger);
 }
 
-```
+.spin-anim {
+    animation: spin 1s linear infinite;
+}
+
+/* Pulsing Background Animations */
+@keyframes pulseBgGreen {
+    0% {
+        background: rgba(34, 197, 94, 0.05);
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0.3), inset 0 0 0 rgba(34, 197, 94, 0.1);
+    }
+
+    50% {
+        background: rgba(34, 197, 94, 0.15);
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), inset 0 0 10px rgba(34, 197, 94, 0.2);
+    }
+
+    100% {
+        background: rgba(34, 197, 94, 0.05);
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0.3), inset 0 0 0 rgba(34, 197, 94, 0.1);
+    }
+}
+
+@keyframes pulseBgRed {
+    0% {
+        background: rgba(239, 68, 68, 0.05);
+        box-shadow: 0 0 0 rgba(239, 68, 68, 0.3), inset 0 0 0 rgba(239, 68, 68, 0.1);
+    }
+
+    50% {
+        background: rgba(239, 68, 68, 0.15);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), inset 0 0 10px rgba(239, 68, 68, 0.2);
+    }
+
+    100% {
+        background: rgba(239, 68, 68, 0.05);
+        box-shadow: 0 0 0 rgba(239, 68, 68, 0.3), inset 0 0 0 rgba(239, 68, 68, 0.1);
+    }
+}
+
+/* Privacy Mode - Enhanced */
+body.privacy-active .card-value,
+body.privacy-active #total-value,
+body.privacy-active #total-cost,
+body.privacy-active #total-pl,
+body.privacy-active #total-pl-rate,
+/* Target the new grid layout columns in Asset Allocation */
+/* 2nd column: Amount */
+body.privacy-active #portfolio-summary>div>div:nth-child(2),
+/* 3rd column: Value + Cost */
+body.privacy-active #portfolio-summary>div>div:nth-child(3),
+/* Investments Table Columns */
+body.privacy-active #investments-table tbody td:nth-child(2),
+/* Amount */
+body.privacy-active #investments-table tbody td:nth-child(3),
+/* Buy Price */
+body.privacy-active #investments-table tbody td:nth-child(4),
+/* Fee */
+body.privacy-active #investments-table tbody td:nth-child(6),
+/* Total Cost */
+body.privacy-active #investments-table tbody td:nth-child(7),
+/* Current Value */
+body.privacy-active #investments-table tbody td:nth-child(8),
+/* P/L */
+body.privacy-active #detail-modal .modal-body {
+    filter: blur(8px);
+    user-select: none;
+    transition: filter 0.3s ease;
+}
+
+/* Ensure icons and labels are NOT blurred */
+body.privacy-active #rates-ticker,
+body.privacy-active .rate-card,
+body.privacy-active #portfolio-summary>div>div:nth-child(1) {
+    filter: none !important;
+}
+
+.glow-positive {
+    animation: pulseBgGreen 2s ease-in-out infinite;
+    border-color: rgba(34, 197, 94, 0.6) !important;
+}
+
+.glow-negative {
+    animation: pulseBgRed 2s ease-in-out infinite;
+    border-color: rgba(239, 68, 68, 0.6) !important;
+}

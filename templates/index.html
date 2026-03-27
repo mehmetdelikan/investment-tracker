@@ -6,13 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yatırım Takip</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 
 <body>
     <div class="container">
-        <header>
-            <h1>Yatırım Takip</h1>
-            <div id="last-updated" style="color: var(--text-secondary); font-size: 0.875rem;"></div>
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Yatırım Takip</h1>
+                <div id="last-updated" style="color: var(--text-secondary); font-size: 0.875rem;"></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="display: flex; align-items: center; gap: 0.5rem; background: var(--card-bg); padding: 0.25rem 0.5rem; border-radius: 8px; border: 1px solid var(--card-border);">
+                    <select id="portfolio-select" onchange="changePortfolio(this.value)"
+                        style="background: transparent; border: none; color: var(--text-primary); font-size: 0.9rem; outline: none; cursor: pointer;">
+                        <!-- Options injected by JS -->
+                    </select>
+                    <button onclick="openAddPortfolioModal()"
+                        style="background: none; border: none; color: var(--accent-green); cursor: pointer; font-size: 1.2rem; line-height: 1;">+</button>
+                </div>
+                <button onclick="toggleTheme()" class="btn-icon" title="Tema Değiştir" style="padding: 0.5rem;">
+                    <svg id="theme-icon" class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Icon content managed by JS -->
+                    </svg>
+                </button>
+                <button onclick="togglePrivacy()" class="btn-icon" title="Gizlilik Modu" style="padding: 0.5rem;">
+                    <svg id="privacy-icon" class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+                <button onclick="refreshData()" class="btn-icon" title="Verileri Güncelle" style="padding: 0.5rem;">
+                    <svg id="refresh-icon" class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+                <span style="color: var(--text-secondary); font-size: 0.9rem;">Merhaba, {{ name }}</span>
+                <a href="{{ url_for('logout') }}" class="btn"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Çıkış
+                    Yap</a>
+            </div>
         </header>
 
         <div class="card" style="margin-bottom: 2rem;">
@@ -23,20 +65,22 @@
         </div>
 
         <!-- Ticker Tape -->
+        <!-- 
         <div class="ticker-wrap">
-            <div class="ticker" id="rates-ticker">
-                <!-- Ticker items will be injected here -->
-            </div>
+            <div class="ticker" id="rates-ticker"> -->
+        <!-- Ticker items will be injected here -->
+        <!-- </div>
         </div>
+        -->
 
         <div class="dashboard-grid">
-            <div class="card">
+            <div class="card" id="financial-summary-card">
                 <div class="card-title">Finansal Özet</div>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
                     <div>
                         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.2rem;">Toplam
                             Varlık</div>
-                        <div class="card-value" id="total-value" style="font-size: 3rem;">₺0.00</div>
+                        <div class="card-value" id="total-value" style="font-size: 2.5rem;">₺0.00</div>
                     </div>
 
                     <div
@@ -68,6 +112,7 @@
             </div>
         </div>
 
+        <!-- 
         <div class="card" style="margin-top: 2rem; margin-bottom: 2rem;">
             <div class="card-title">Alternatif Senaryo</div>
             <div id="alternative-scenario"
@@ -78,9 +123,33 @@
                 <div class="loading-spinner"></div>
             </div>
         </div>
+        -->
 
         <div class="investments-list">
-            <div class="card-title" style="margin-bottom: 1rem;">Yatırımlarım</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                <div class="card-title" style="margin-bottom: 0;">Yatırımlarım</div>
+                <div style="display:flex; gap:0.5rem;">
+                    <input type="file" id="import-file" accept=".csv" style="display:none;"
+                        onchange="handleFileImport(this)">
+                    <button onclick="document.getElementById('import-file').click()" class="btn"
+                        style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                        <svg class="svg-icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Veri Yükle
+                    </button>
+                    <button onclick="exportCSV()" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                        <svg class="svg-icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Excel'e Aktar
+                    </button>
+                </div>
+            </div>
             <div style="overflow-x: auto;">
                 <table class="investments-table">
                     <thead>
@@ -104,6 +173,10 @@
         </div>
     </div>
 
+    </div>
+
+
+
     <button class="fab-btn" onclick="openModal()" title="Yeni Yatırım Ekle">
         <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -111,12 +184,60 @@
         </svg>
     </button>
 
+    </button>
+
+    <!-- Asset Detail Modal -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom: 1.5rem;">
+                <div id="detail-icon"></div>
+                <h2 id="detail-title">Varlık Detayı</h2>
+            </div>
+
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 1.5rem; gap: 1rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem;">
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">Toplam Miktar</div>
+                    <div id="detail-amount" style="font-size:1.2rem; font-weight:600;">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem;">
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">Ort. Maliyet</div>
+                    <div id="detail-avg-cost" style="font-size:1.2rem; font-weight:600;">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem;">
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">Güncel Değer</div>
+                    <div id="detail-value" style="font-size:1.2rem; font-weight:600;">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem;">
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">Kar / Zarar</div>
+                    <div id="detail-pl" style="font-size:1.2rem; font-weight:600;">-</div>
+                </div>
+            </div>
+
+            <h3 style="font-size:1rem; margin-bottom:0.5rem;">İşlem Geçmişi</h3>
+            <div style="max-height: 300px; overflow-y: auto;">
+                <table class="investments-table" style="font-size:0.9rem;">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Miktar</th>
+                            <th>Fiyat</th>
+                            <th>Tutar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Investment Modal -->
     <div class="modal" id="add-modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">&times;</button>
-            <h2 style="margin-bottom: 1.5rem;">Yeni Yatırım Ekle</h2>
-            <form onsubmit="addInvestment(event)">
+            <h2 id="modal-title" style="margin-bottom: 1.5rem;">Yeni Yatırım Ekle</h2>
+            <form onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="investment-id">
                 <div class="form-group">
                     <label>Döviz Cinsi</label>
                     <select id="currency" required>
@@ -147,6 +268,21 @@
         </div>
     </div>
 
+    <!-- Add Portfolio Modal -->
+    <div class="modal" id="add-portfolio-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="close-btn" onclick="closeAddPortfolioModal()">&times;</button>
+            <h2 style="margin-bottom: 1.5rem;">Yeni Portföy Ekle</h2>
+            <form onsubmit="handlePortfolioSubmit(event)">
+                <div class="form-group">
+                    <label>Portföy Adı</label>
+                    <input type="text" id="portfolio-name" required placeholder="Örn: Çocuklar">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Oluştur</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal" id="delete-modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
@@ -162,6 +298,12 @@
     </div>
 
     <script src="/static/script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(() => console.log('Service Worker Registered'));
+        }
+    </script>
 </body>
 
 </html>

@@ -2,3 +2,7 @@ Flask
 requests
 beautifulsoup4
 gunicorn
+flask-login
+flask-sqlalchemy
+psycopg2-binary
+python-dotenv
