@@ -14,12 +14,12 @@
 
 <body>
     <div class="container">
-        <header style="display: flex; justify-content: space-between; align-items: center;">
+        <header class="main-header">
             <div>
                 <h1>Yatırım Takip</h1>
                 <div id="last-updated" style="color: var(--text-secondary); font-size: 0.875rem;"></div>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="header-actions">
                 <div
                     style="display: flex; align-items: center; gap: 0.5rem; background: var(--card-bg); padding: 0.25rem 0.5rem; border-radius: 8px; border: 1px solid var(--card-border);">
                     <select id="portfolio-select" onchange="changePortfolio(this.value)"
