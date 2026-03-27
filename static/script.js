@@ -908,4 +908,5 @@ async function init() {
 }
 
 init();
-setInterval(fetchRates, 60000);
+// Otonom güncellemeyi kapattık. Sadece manuel olarak yenilenecek:
+// setInterval(fetchRates, 60000);
